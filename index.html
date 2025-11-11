@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profil Daniel Andreas - Darkness Style</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+    body{
+      background:#0a0a0a;
+      color:#eaeaea;
+      padding:30px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .container{
+      width:100%;
+      max-width:900px;
+      background:#111;
+      padding:30px;
+      border-radius:15px;
+      box-shadow:0 0 25px red;
+    }
+
+    h1,h2{
+      text-align:center;
+      margin-bottom:20px;
+      color:#ff3b3b;
+      text-shadow:0 0 10px red;
+    }
+
+    p{
+      line-height:1.6;
+      margin-bottom:15px;
+      color:#d4d4d4;
+    }
+
+    .product-box{
+      background:#1b1b1b;
+      padding:20px;
+      border-left:5px solid red;
+      border-radius:10px;
+      box-shadow:0 0 15px red;
+      margin-top:20px;
+    }
+
+    .buttons{
+      margin-top:25px;
+      display:flex;
+      justify-content:center;
+      gap:15px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      padding:12px 20px;
+      background:#ff3b3b;
+      color:black;
+      font-weight:bold;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      text-decoration:none;
+      transition:.3s;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .btn:hover{
+      background:#ff6b6b;
+      box-shadow:0 0 12px red;
+    }
+
+    /* POPUP */
+    #popup{
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      visibility:hidden;
+      opacity:0;
+      transition:.3s ease-in-out;
+    }
+
+    #popup.active{
+      visibility:visible;
+      opacity:1;
+    }
+
+    .popup-box{
+      background:#1b1b1b;
+      padding:25px;
+      width:320px;
+      border-radius:12px;
+      text-align:center;
+      box-shadow:0 0 20px red;
+      transform:scale(0.5);
+      animation:pop .3s forwards;
+    }
+
+    @keyframes pop{
+      to{transform:scale(1);}
+    }
+
+    .popup-box h3{
+      color:#ff3b3b;
+      margin-bottom:15px;
+    }
+
+    .popup-btn{
+      display:block;
+      margin:12px 0;
+      padding:10px;
+      background:#ff3b3b;
+      color:black;
+      border-radius:6px;
+      text-decoration:none;
+      font-weight:bold;
+      transition:.3s;
+    }
+
+    .popup-btn:hover{
+      background:#ff6b6b;
+      box-shadow:0 0 10px red;
+    }
+
+    .close-popup{
+      margin-top:15px;
+      cursor:pointer;
+      color:#bbb;
+    }
+
+    .close-popup:hover{
+      color:white;
+    }
+
+    .footer{
+      text-align:center;
+      margin-top:30px;
+      color:#666;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Profil Daniel Andreas</h1>
+  <p><strong>Profesi:</strong> EO Manager - PT AESTEHETIC</p>
+  <p><strong>Karakter:</strong> Leo Man Eksekutif</p>
+  <p><strong>Hobi:</strong> BERNIAGA BERJUALAN BELANJA</p>
+
+  <div class="product-box">
+    <h2>Produk Unggulan: TAB HP LAPTOP</h2>
+    <p>
+      Produk misterius bernuansa gelap, dirancang untuk mereka yang berani,
+      visioner, dan tidak takut tampil beda. Memberikan pengalaman unik dengan gaya futuristik.
+    </p>
+  </div>
+
+  <div class="buttons">
+    <button class="btn" onclick="openPopup()">Pilih Market</button>
+  </div>
+
+  <div class="footer">© 2025 Daniel Andreas Darkness Web</div>
+</div>
+
+<!-- POPUP LAYAR -->
+<div id="popup">
+  <div class="popup-box">
+    <h3>Pilih Market</h3>
+
+    <a class="popup-btn" href="marketplace.html">Market1</a>
+    <a class="popup-btn" href="marketplace2.html">Market2</a>
+    <a class="popup-btn" href="marketplace3.html">Market3</a>
+
+    <div class="close-popup" onclick="closePopup()">Tutup</div>
+  </div>
+</div>
+
+<script>
+  function openPopup(){
+    document.getElementById("popup").classList.add("active");
+  }
+
+  function closePopup(){
+    document.getElementById("popup").classList.remove("active");
+  }
+</script>
+
+</body>
+</html>

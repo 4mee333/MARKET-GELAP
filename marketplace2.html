@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aesthetic Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @keyframes floaty { 
+            0% { transform: translateY(0)} 
+            50% { transform: translateY(-6px)} 
+            100% { transform: translateY(0)} 
+        }
+        .card-hover { 
+            transition: transform .28s cubic-bezier(.22,.9,.39,1), box-shadow .28s; 
+        }
+        .card-hover:hover { 
+            transform: translateY(-8px) scale(1.01); 
+            box-shadow: 0 20px 40px rgba(2,6,23,0.12); 
+        }
+        .dark-mode { 
+            background-color: #0b1020; 
+            color: #e6eef8; 
+        }
+        .dark-mode .bg-white { 
+            background-color: #1a1f35 !important; 
+            color: #e6eef8 !important; 
+        }
+        .dark-mode .text-gray-800 { 
+            color: #e6eef8 !important; 
+        }
+        .dark-mode .text-gray-600 { 
+            color: #9ca3af !important; 
+        }
+        .dark-mode .bg-gray-50 { 
+            background-color: #0b1020 !important; 
+        }
+        .dark-mode input { 
+            background-color: #1a1f35 !important; 
+            color: #e6eef8 !important; 
+            border-color: #374151 !important; 
+        }
+        .logo-mark { 
+            width:40px; 
+            height:40px; 
+            border-radius:10px; 
+            background:linear-gradient(135deg,#7c3aed,#06b6d4); 
+            display:inline-block 
+        }
+        .product-img {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-align: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800 bg-gray-50" id="body">
+
+    <!-- NAVBAR -->
+    <nav class="w-full bg-white/80 backdrop-blur-md shadow-sm fixed top-0 left-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="logo-mark"></div>
+                <h1 class="text-2xl font-bold tracking-tight">Aesthetic<span class="text-gray-400">Market</span></h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <input id="searchInput" type="text" placeholder="Cari barang..." 
+                    class="w-72 px-4 py-2 rounded-xl border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <button id="darkToggle" class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition">
+                    🌙 Dark
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="w-full h-[280px] bg-gradient-to-br from-purple-50 to-cyan-50 flex items-center justify-center mt-20 rounded-xl max-w-7xl mx-auto shadow-md">
+        <div class="text-center px-6">
+            <h2 class="text-4xl font-semibold mb-2 bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                Belanja dengan gaya — Aesthetic & Clean
+            </h2>
+            <p class="text-gray-600">COD di tempat atau kirim dengan JNT, SiCepat, JNE — tampilan modern, responsive, dan cepat.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="max-w-7xl mx-auto mt-10 px-4">
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- SIDEBAR -->
+            <aside class="w-full md:w-64 bg-white p-4 rounded-2xl shadow-lg sticky top-28 h-fit">
+                <h3 class="font-semibold mb-3 text-lg">Kategori</h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li class="cursor-pointer hover:text-purple-600 transition p-2 rounded-lg hover:bg-purple-50" data-cat="all">
+                        📱 Semua Produk
+                    </li>
+                    <li class="cursor-pointer hover:text-purple-600 transition p-2 rounded-lg hover:bg-purple-50" data-cat="smartphone">
+                        📱 Smartphone
+                    </li>
+                    <li class="cursor-pointer hover:text-purple-600 transition p-2 rounded-lg hover:bg-purple-50" data-cat="tablet">
+                        📱 Tablet
+                    </li>
+                    <li class="cursor-pointer hover:text-purple-600 transition p-2 rounded-lg hover:bg-purple-50" data-cat="laptop">
+                        💻 Laptop
+                    </li>
+                </ul>
+
+                <hr class="my-4 border-gray-200" />
+                <h4 class="font-medium mb-2">💡 Tips Belanja</h4>
+                <div class="text-sm text-gray-500 leading-relaxed">
+                    <p><strong>Flagship:</strong> Performa maksimal</p>
+                    <p><strong>Mid-range:</strong> Value terbaik</p>
+                    <p><strong>Budget:</strong> Daily use hemat</p>
+                </div>
+            </aside>
+
+            <!-- MAIN -->
+            <main class="flex-1">
+                <div class="mb-4 flex justify-between items-center">
+                    <h3 class="text-xl font-semibold" id="categoryTitle">Semua Produk</h3>
+                    <span class="text-gray-500" id="productCount">150 produk</span>
+                </div>
+                <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+
+                <div id="loadMoreWrap" class="text-center mt-8">
+                    <button id="loadMore" class="px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-semibold hover:shadow-lg transition transform hover:scale-105">
+                        Muat lebih banyak
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="mt-12 py-6 text-center text-gray-500 border-t border-gray-200">
+            <p>© 2025 AestheticMarket — COD & Pengiriman Online</p>
+            <p class="text-sm mt-1">Belanja mudah, aman, dan terpercaya</p>
+        </footer>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl" id="modalContent">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div id="modalImg" class="product-img w-full md:w-64 h-64 rounded-xl flex-shrink-0"></div>
+                <div class="flex-1">
+                    <h3 id="modalTitle" class="text-2xl font-bold mb-2"></h3>
+                    <div id="modalPrice" class="mt-2 font-bold text-2xl text-purple-600"></div>
+                    <p id="modalDesc" class="mt-3 text-gray-600 leading-relaxed"></p>
+                    <div class="mt-6 flex gap-3">
+                        <button id="addCartBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
+                            🛒 Tambah ke Keranjang
+                        </button>
+                        <button id="codBtn" class="px-6 py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition font-semibold">
+                            💵 Pilih COD
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-right">
+                <button id="closeModal" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition">
+                    ✕ Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const products = [];
+        let currentFilter = 'all';
+        
+        const smartphones = [
+            'iPhone 15 Pro Max 256GB','iPhone 15 128GB','iPhone 14 128GB',
+            'Samsung Galaxy S25 Ultra 256GB','Samsung Galaxy S23 128GB',
+            'Samsung Galaxy Z Flip6','Samsung Galaxy Z Fold6',
+            'Xiaomi Redmi 13X 8/256GB','Xiaomi Redmi Note 12 8/128GB','Xiaomi 14',
+            'OPPO Find N5','OPPO Reno12','vivo V30 Pro','vivo Y100',
+            'realme GT5','POCO X6 Pro','Nokia G60','Motorola Edge 40',
+            'Google Pixel 8','OnePlus 12','Infinix Note 40','Tecno Pova 5',
+            'Samsung A15','Xiaomi Redmi 14C','Honor Magic Vs','Sony Xperia 1 V',
+            'Asus ROG Phone 8','Lenovo Legion Phone','vivo X100','OPPO Find X6','Samsung S24 FE'
+        ];
+        
+        const tablets = [
+            'iPad 10th Gen','iPad Air M1','Samsung Galaxy Tab S9',
+            'Xiaomi Pad 6','Lenovo Tab P11','Huawei MatePad 11'
+        ];
+        
+        const laptops = [
+            'MacBook Air M2 256GB','MacBook Pro 14 M2 Pro',
+            'Asus Vivobook 14','Asus ROG Strix G15','Acer Aspire 5','Acer Swift 3',
+            'Lenovo IdeaPad 3','Lenovo Yoga Slim 7','HP Pavilion 15',
+            'Dell XPS 13','Dell Inspiron 15','MSI GF63','Microsoft Surface Laptop 5'
+        ];
+
+        function addItems(list, category, count, priceFn) {
+            for (let i = 0; i < count; i++) {
+                const model = list[i % list.length] + (Math.floor(i/list.length) ? ' Variant ' + (Math.floor(i/list.length)+1) : '');
+                const id = (category[0] + i + Date.now()).toString();
+                const price = priceFn(model);
+                products.push({ 
+                    id, 
+                    title: model, 
+                    category, 
+                    price, 
+                    desc: `${model} dengan spesifikasi unggulan. Garansi resmi dan original 100%.`, 
+                    img: model
+                });
+            }
+        }
+
+        function phonePrice(model) {
+            if (/Pro|Ultra|Max|12GB|16GB|14 Pro|14 Pro Max|15 Pro|S25|Find N5|X100|OnePlus 12/i.test(model)) 
+                return rand(9000000, 26000000);
+            if (/Flip|Fold|Fold6|Flip6/i.test(model)) 
+                return rand(16000000, 32000000);
+            if (/iPhone 14|iPhone 15|Pixel|Galaxy S23|Galaxy S24|Xiaomi 14|Find X6|Reno12/i.test(model)) 
+                return rand(7000000, 22000000);
+            if (/Redmi|vivo|realme|POCO|Nokia|Motorola|Infinix|Tecno|Honor|Samsung A|Redmi 13X|14C/i.test(model)) 
+                return rand(1200000, 4999000);
+            return rand(2500000, 8999000);
+        }
+        
+        function tabletPrice(model) { 
+            if (/iPad|Galaxy Tab S9|MatePad/i.test(model)) 
+                return rand(4000000, 16000000); 
+            return rand(2500000, 7000000);
+        } 
+        
+        function laptopPrice(model) { 
+            if (/MacBook Pro|ROG|XPS|Surface/i.test(model)) 
+                return rand(12000000, 55000000); 
+            if (/MacBook Air|Zenbook|Yoga|Swift/i.test(model)) 
+                return rand(8000000, 25000000); 
+            return rand(4000000, 12000000);
+        } 
+        
+        function rand(min, max) { 
+            return Math.floor(Math.random() * (max - min + 1)) + min; 
+        }
+
+        addItems(smartphones, 'smartphone', 100, phonePrice);
+        addItems(tablets, 'tablet', 25, tabletPrice);
+        addItems(laptops, 'laptop', 25, laptopPrice);
+
+        const grid = document.getElementById('productGrid');
+        let displayed = 0; 
+        const perPage = 24;
+        let filteredProducts = [...products];
+        
+        function money(n) { 
+            return 'Rp ' + n.toLocaleString('id-ID'); 
+        }
+        
+        function getProductIcon(category) {
+            const icons = { smartphone: '📱', tablet: '📱', laptop: '💻' };
+            return icons[category] || '📦';
+        }
+        
+        function renderChunk() {
+            const chunk = filteredProducts.slice(displayed, displayed + perPage);
+            chunk.forEach(p => {
+                const el = document.createElement('article');
+                el.className = 'bg-white p-4 rounded-2xl shadow card-hover cursor-pointer';
+                el.innerHTML = `
+                    <div class="product-img rounded-xl mb-3 w-full h-48">
+                        <div>${getProductIcon(p.category)}<br>${escapeHtml(p.title)}</div>
+                    </div>
+                    <h4 class="font-semibold text-sm mb-1 line-clamp-2">${escapeHtml(p.title)}</h4>
+                    <p class="text-gray-500 text-xs mb-2 line-clamp-1">${p.category.toUpperCase()}</p>
+                    <p class="font-bold text-purple-600 mb-3">${money(p.price)}</p>
+                    <div class="flex gap-2">
+                        <button class="openBtn flex-1 px-3 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition text-sm font-medium" data-id="${p.id}">
+                            Detail
+                        </button>
+                        <button class="addBtn flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium" data-id="${p.id}">
+                            + Keranjang
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+            displayed += chunk.length;
+            
+            if (displayed >= filteredProducts.length) {
+                document.getElementById('loadMore').style.display = 'none';
+            }
+            attachButtons();
+        }
+        
+        function attachButtons() {
+            document.querySelectorAll('.openBtn').forEach(b => 
+                b.onclick = (e) => { e.stopPropagation(); openModal(b.dataset.id); }
+            );
+            document.querySelectorAll('.addBtn').forEach(b => 
+                b.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    const p = products.find(x => x.id === b.dataset.id);
+                    alert('✅ Ditambahkan ke keranjang:\n' + p.title); 
+                }
+            );
+        }
+        
+        function openModal(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            
+            const modalImg = document.getElementById('modalImg');
+            modalImg.innerHTML = `<div>${getProductIcon(p.category)}<br>${escapeHtml(p.title)}</div>`;
+            
+            document.getElementById('modalTitle').textContent = p.title;
+            document.getElementById('modalPrice').textContent = money(p.price);
+            document.getElementById('modalDesc').textContent = p.desc;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+            
+            document.getElementById('addCartBtn').onclick = () => {
+                alert('✅ Ditambahkan ke keranjang:\n' + p.title);
+            };
+            
+            document.getElementById('codBtn').onclick = () => {
+                alert('💵 COD dipilih untuk:\n' + p.title + '\n\nSilakan lanjutkan checkout.');
+            };
+        }
+        
+        document.getElementById('closeModal').onclick = () => { 
+            document.getElementById('modal').classList.add('hidden'); 
+            document.getElementById('modal').classList.remove('flex'); 
+        };
+        
+        document.getElementById('modal').onclick = (e) => {
+            if (e.target.id === 'modal') {
+                document.getElementById('modal').classList.add('hidden');
+                document.getElementById('modal').classList.remove('flex');
+            }
+        };
+        
+        document.getElementById('loadMore').onclick = renderChunk;
+        
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            grid.innerHTML = '';
+            displayed = 0;
+            
+            filteredProducts = products.filter(p => {
+                const matchSearch = p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+                const matchCategory = currentFilter === 'all' || p.category === currentFilter;
+                return matchSearch && matchCategory;
+            });
+            
+            updateProductCount();
+            renderChunk();
+        });
+
+        document.querySelectorAll('[data-cat]').forEach(item => {
+            item.onclick = () => {
+                currentFilter = item.dataset.cat;
+                grid.innerHTML = '';
+                displayed = 0;
+                
+                const q = document.getElementById('searchInput').value.toLowerCase();
+                filteredProducts = products.filter(p => {
+                    const matchSearch = !q || p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+                    const matchCategory = currentFilter === 'all' || p.category === currentFilter;
+                    return matchSearch && matchCategory;
+                });
+                
+                const titles = {
+                    'all': 'Semua Produk',
+                    'smartphone': 'Smartphone',
+                    'tablet': 'Tablet',
+                    'laptop': 'Laptop'
+                };
+                
+                document.getElementById('categoryTitle').textContent = titles[currentFilter];
+                updateProductCount();
+                renderChunk();
+                
+                document.querySelectorAll('[data-cat]').forEach(i => i.classList.remove('text-purple-600', 'bg-purple-50'));
+                item.classList.add('text-purple-600', 'bg-purple-50');
+            };
+        });
+
+        function updateProductCount() {
+            document.getElementById('productCount').textContent = filteredProducts.length + ' produk';
+        }
+
+        function escapeHtml(str) { 
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); 
+        }
+
+        const darkToggle = document.getElementById('darkToggle');
+        darkToggle.onclick = () => {
+            document.getElementById('body').classList.toggle('dark-mode');
+            if (document.getElementById('body').classList.contains('dark-mode')) {
+                darkToggle.innerHTML = '☀️ Light';
+            } else {
+                darkToggle.innerHTML = '🌙 Dark';
+            }
+        };
+
+        renderChunk();
+    </script>
+</body>
+</html>

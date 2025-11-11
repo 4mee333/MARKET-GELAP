@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aesthetic Marketplace — Demo (Enhanced)</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @keyframes floaty { 0% { transform: translateY(0)} 50% { transform: translateY(-6px)} 100% { transform: translateY(0)} }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Enhanced Card Hover with more pronounced shadow and lift */
+        .card-hover { transition: transform .35s cubic-bezier(.22,.9,.39,1), box-shadow .35s; }
+        .card-hover:hover { transform: translateY(-12px) scale(1.01); box-shadow: 0 25px 50px rgba(2,6,23,0.18); }
+        
+        /* Dark Mode Styling */
+        .dark-mode { background-color: #0d111c; color: #e6eef8; }
+        .dark-mode .bg-white { background-color: #161b22; color: #e6eef8; }
+        .dark-mode .text-gray-800 { color: #e6eef8; }
+        .dark-mode .text-gray-500, .dark-mode .text-gray-700 { color: #a0aec0; }
+        .dark-mode .border-gray-200, .dark-mode .border-gray-300 { border-color: #30363d; }
+        .dark-mode .shadow-sm, .dark-mode .shadow-lg { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .dark-mode input, .dark-mode select { background-color: #161b22; color: #e6eef8; border-color: #30363d; }
+        .dark-mode .bg-gray-50 { background-color: #0d111c; }
+        .dark-mode .hover\:bg-gray-100:hover { background-color: #161b22; }
+        .dark-mode .modal-content { background-color: #161b22; }
+
+        .logo-mark { width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#7c3aed,#06b6d4); display:inline-block; animation: floaty 3s ease-in-out infinite; }
+        .toolbar-icon { transition: color 0.3s, transform 0.1s; }
+        .toolbar-icon:hover { color: #7c3aed; transform: scale(1.05); }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .badge { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; padding: 3px 7px; font-size: 11px; font-weight: bold; border: 2px solid white; /* Border for visibility in dark mode */ }
+        .dark-mode .badge { border: 2px solid #161b22; }
+        
+        /* Custom Scrollbar for aesthetic look (optional, for supported browsers) */
+        body::-webkit-scrollbar { width: 10px; }
+        body::-webkit-scrollbar-track { background: #f0f4f8; }
+        .dark-mode::-webkit-scrollbar-track { background: #0d111c; }
+        body::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 20px; border: 3px solid #f0f4f8; }
+        .dark-mode::-webkit-scrollbar-thumb { background-color: #30363d; border: 3px solid #0d111c; }
+    </style>
+</head>
+<body class="text-gray-800 bg-gray-50 transition-colors duration-500" id="body">
+
+    <nav class="w-full bg-white/80 backdrop-blur-md shadow-sm fixed top-0 left-0 z-50 transition-colors duration-500 dark:bg-black/40 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="logo-mark"></div>
+                <h1 class="text-2xl font-bold tracking-tight dark:text-white">Aesthetic<span class="text-gray-400">Market</span></h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <input id="searchInput" type="text" placeholder="Cari barang..." class="w-72 px-4 py-2 rounded-xl border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all dark:bg-gray-800 dark:border-gray-700 dark:text-white" />
+                <button id="darkToggle" class="px-3 py-2 rounded-xl border hover:bg-gray-100 transition dark:hover:bg-gray-700 dark:text-white dark:border-gray-700"><i class="fas fa-moon"></i> Dark</button>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 py-2 border-t border-gray-200 flex justify-center gap-8 dark:border-gray-700">
+            <div class="relative toolbar-icon cursor-pointer text-gray-700 dark:text-gray-400" id="homeBtn">
+                <i class="fas fa-home text-xl"></i>
+            </div>
+            <div class="relative toolbar-icon cursor-pointer text-gray-700 dark:text-gray-400" id="wishlistBtn">
+                <i class="fas fa-heart text-xl"></i>
+                <span class="badge" id="wishlistBadge" style="display:none;">0</span>
+            </div>
+            <div class="relative toolbar-icon cursor-pointer text-gray-700 dark:text-gray-400" id="cartBtn">
+                <i class="fas fa-shopping-cart text-xl"></i>
+                <span class="badge" id="cartBadge" style="display:none;">0</span>
+            </div>
+            <div class="toolbar-icon cursor-pointer text-gray-700 dark:text-gray-400" id="accountBtn">
+                <i class="fas fa-user-circle text-xl"></i>
+            </div>
+            <div class="toolbar-icon cursor-pointer text-gray-700 dark:text-gray-400" id="sortBtn">
+                <i class="fas fa-sort-amount-down text-xl"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section class="w-full h-[360px] bg-gradient-to-br from-purple-500 via-pink-600 to-red-600 flex items-center justify-center mt-28 rounded-3xl max-w-7xl mx-auto shadow-2xl relative overflow-hidden transform hover:scale-[1.005] transition-transform duration-500">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="text-center px-6 text-white z-10 fade-in">
+            <h2 class="text-6xl font-extrabold mb-4 drop-shadow-xl">Belanja dengan Gaya 😎</h2>
+            <p class="text-xl text-gray-100 drop-shadow">Temukan produk teknologi premium, modern, dan clean.</p>
+            <button class="mt-8 px-8 py-3 bg-white text-purple-600 rounded-full font-bold text-lg shadow-lg hover:bg-gray-100 transition transform hover:scale-105">Jelajahi Sekarang <i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto mt-12 px-4">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside class="w-full md:w-64 bg-white p-6 rounded-3xl shadow-xl sticky top-36 h-fit fade-in transition-colors duration-500 dark:bg-gray-800 dark:shadow-2xl">
+                <h3 class="font-bold text-xl mb-4 border-b pb-2 dark:border-gray-700">Filter & Kategori</h3>
+                <h4 class="font-semibold mb-3">Kategori</h4>
+                <ul class="space-y-3 text-gray-700 dark:text-gray-400">
+                    <li class="cat-item cursor-pointer hover:text-purple-500 transition font-medium" data-cat="all">Semua Produk</li>
+                    <li class="cat-item cursor-pointer hover:text-purple-500 transition" data-cat="smartphone">Smartphone <span class="text-xs ml-1">(100)</span></li>
+                    <li class="cat-item cursor-pointer hover:text-purple-500 transition" data-cat="tablet">Tablet <span class="text-xs ml-1">(25)</span></li>
+                    <li class="cat-item cursor-pointer hover:text-purple-500 transition" data-cat="laptop">Laptop <span class="text-xs ml-1">(25)</span></li>
+                </ul>
+
+                <hr class="my-5 dark:border-gray-700" />
+                <h4 class="font-semibold mb-3">Urutkan Harga</h4>
+                <div class="mt-2">
+                    <select id="sortSelect" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-purple-500 focus:border-purple-500">
+                        <option value="default">Default</option>
+                        <option value="low-high">Rendah ke Tinggi</option>
+                        <option value="high-low">Tinggi ke Rendah</option>
+                    </select>
+                </div>
+            </aside>
+
+            <main class="flex-1">
+                <h2 class="text-3xl font-bold mb-6 dark:text-white" id="mainTitle">Semua Produk Terbaru</h2>
+                <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+                <div id="loadMoreWrap" class="text-center mt-10">
+                    <button id="loadMore" class="px-8 py-3 rounded-full bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-semibold shadow-lg hover:from-purple-600 hover:to-cyan-500 transition transform hover:scale-105">
+                        <i class="fas fa-sync-alt mr-2"></i> Muat lebih banyak
+                    </button>
+                    <p id="endMessage" class="mt-4 text-gray-500 hidden dark:text-gray-400">👋 Semua produk sudah ditampilkan!</p>
+                </div>
+            </main>
+        </div>
+
+        <footer class="mt-16 py-8 border-t border-gray-200 text-center text-gray-500 dark:border-gray-700 dark:text-gray-400">
+            <p class="mb-2">AestheticMarket — Dibuat dengan ❤️ & TailwindCSS</p>
+            <p>© 2025 Semua Hak Cipta Dilindungi</p>
+        </footer>
+    </div>
+
+    <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50 p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-8 max-w-3xl w-full shadow-2xl modal-content transform scale-95 transition-transform duration-300 dark:bg-gray-800" id="modalContent">
+            <div class="flex flex-col md:flex-row gap-6">
+                <img id="modalImg" src="" class="w-full md:w-56 h-56 object-cover rounded-xl shadow-md" />
+                <div>
+                    <h3 id="modalTitle" class="text-3xl font-bold dark:text-white"></h3>
+                    <div id="modalCategory" class="text-sm text-purple-600 font-medium mt-1"></div>
+                    <div id="modalPrice" class="mt-3 font-extrabold text-2xl text-purple-600 dark:text-cyan-400"></div>
+                    <p id="modalDesc" class="mt-4 text-gray-600 dark:text-gray-400"></p>
+                    <div id="modalRating" class="mt-3 flex items-center text-yellow-400"></div>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button id="addCartBtn" class="px-5 py-2 bg-green-500 text-white font-semibold rounded-full shadow-md hover:bg-green-600 transition transform hover:scale-[1.02]">
+                            <i class="fas fa-shopping-cart mr-2"></i> Tambah ke Keranjang
+                        </button>
+                        <button id="codBtn" class="px-5 py-2 border border-gray-300 text-gray-700 font-semibold rounded-full hover:bg-gray-100 transition dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                            <i class="fas fa-money-check-alt mr-2"></i> Pilih COD
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-right border-t pt-4 dark:border-gray-700">
+                <button id="closeModal" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-times mr-1"></i> Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // HTML escape function
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+        // Helper to generate a random integer
+        function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+        // --- DATASET: 150 produk (smartphone / tablet / laptop)
+        const products = [];
+        const smartphones = [
+            'iPhone 15 Pro Max 256GB','iPhone 15 128GB','iPhone 14 128GB','Samsung Galaxy S25 Ultra 256GB','Samsung Galaxy S23 128GB','Samsung Galaxy Z Flip6','Samsung Galaxy Z Fold6','Xiaomi Redmi 13X 8/256GB','Xiaomi Redmi Note 12 8/128GB','Xiaomi 14','OPPO Find N5','OPPO Reno12','vivo V30 Pro','vivo Y100','realme GT5','POCO X6 Pro','Nokia G60','Motorola Edge 40','Google Pixel 8','OnePlus 12','Infinix Note 40','Tecno Pova 5','Samsung A15','Xiaomi Redmi 14C','Honor Magic Vs','Sony Xperia 1 V','Asus ROG Phone 8','Lenovo Legion Phone','vivo X100','OPPO Find X6','Samsung S24 FE'
+        ];
+        const tablets = ['iPad 10th Gen','iPad Air M1','Samsung Galaxy Tab S9','Xiaomi Pad 6','Lenovo Tab P11','Huawei MatePad 11'];
+        const laptops = ['MacBook Air M2 256GB','MacBook Pro 14 M2 Pro','Asus Vivobook 14','Asus ROG Strix G15','Acer Aspire 5','Acer Swift 3','Lenovo IdeaPad 3','Lenovo Yoga Slim 7','HP Pavilion 15','Dell XPS 13','Dell Inspiron 15','MSI GF63','Microsoft Surface Laptop 5'];
+
+        function addItems(list, category, count, priceFn) {
+            for (let i=0;i<count;i++){
+                const model = list[i % list.length] + (Math.floor(i/list.length) ? ' ' + (Math.floor(i/list.length)+1) : '');
+                const id = (category[0]+ i + Date.now()).toString() + i;
+                const price = priceFn(model);
+                // Added rating, review count, and status
+                const rating = (Math.random() * (5.0 - 3.5) + 3.5).toFixed(1); // 3.5 to 5.0
+                const reviews = rand(10, 500);
+                const status = (Math.random() < 0.15) ? 'Habis' : 'Stok Tersedia'; 
+                products.push({ id, title: model, category, price, desc: category+ ' ' + model + ' — spesifikasi & harga standard.', img: 'https://picsum.photos/seed/'+encodeURIComponent(id)+'/600/400', rating, reviews, status });
+            }
+        }
+
+        // Price functions (approx based on market sources)
+        function phonePrice(model){
+            if (/Pro|Ultra|Max|12GB|16GB|14 Pro|14 Pro Max|15 Pro|S25|Find N5|X100|OnePlus 12/i.test(model)) return rand(9000000, 26000000);
+            if (/Flip|Fold|Fold6|Flip6|Fold/i.test(model)) return rand(16000000, 32000000);
+            if (/iPhone 14|iPhone 15|Pixel|Galaxy S23|Galaxy S24|Xiaomi 14|Find X6|Reno12/i.test(model)) return rand(7000000, 22000000);
+            if (/Redmi|vivo|realme|POCO|Nokia|Motorola|Infinix|Tecno|Honor|Samsung A|Redmi 13X|14C/i.test(model)) return rand(1200000, 4999000);
+            return rand(2500000, 8999000);
+        }
+        function tabletPrice(model){ if (/iPad|Galaxy Tab S9|MatePad/i.test(model)) return rand(4000000, 16000000); return rand(2500000, 7000000);} 
+        function laptopPrice(model){ if (/MacBook Pro|ROG|XPS|Surface/i.test(model)) return rand(12000000, 55000000); if (/MacBook Air|Zenbook|Yoga|Swift/i.test(model)) return rand(8000000, 25000000); return rand(4000000, 12000000);} 
+
+        // create 100 smartphones, 25 tablets, 25 laptops = 150
+        addItems(smartphones,'smartphone',100, phonePrice);
+        addItems(tablets,'tablet',25, tabletPrice);
+        addItems(laptops,'laptop',25, laptopPrice);
+
+
+        // --- RENDER LOGIC ---
+        const grid = document.getElementById('productGrid');
+        const loadMoreBtn = document.getElementById('loadMore');
+        let displayed = 0; const perPage = 24;
+        let currentProducts = [...products];
+        let cart = [];
+        let wishlist = [];
+        function money(n){ return 'Rp '+n.toLocaleString('id-ID'); }
+
+        function generateRatingHtml(rating, reviews) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+            let html = '<div class="flex items-center">';
+            for(let i=0; i<fullStars; i++) html += '<i class="fas fa-star text-yellow-400 text-sm"></i>';
+            if(halfStar) html += '<i class="fas fa-star-half-alt text-yellow-400 text-sm"></i>';
+            for(let i=0; i<emptyStars; i++) html += '<i class="far fa-star text-yellow-400 text-sm"></i>';
+            html += `<span class="text-xs ml-2 text-gray-500 dark:text-gray-400">(${rating}/5.0 • ${reviews.toLocaleString('id-ID')} ulasan)</span></div>`;
+            return html;
+        }
+
+        function renderChunk(){
+            const chunk = currentProducts.slice(displayed, displayed+perPage);
+            chunk.forEach(p=>{
+                const el = document.createElement('article');
+                // Added opacity for 'Habis' status
+                const isOutOfStock = p.status === 'Habis';
+                el.className = `bg-white p-4 rounded-2xl shadow card-hover fade-in transition-colors duration-500 dark:bg-gray-800 ${isOutOfStock ? 'opacity-50 pointer-events-none' : ''}`;
+                
+                const statusBadge = isOutOfStock 
+                    ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">HABIS</span>`
+                    : `<span class="absolute top-2 left-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">STOK</span>`;
+
+                el.innerHTML = `
+                    <div class="relative">
+                        <img src="${p.img}" class="rounded-xl mb-3 w-full h-40 object-cover" alt="${escapeHtml(p.title)}" />
+                        ${statusBadge}
+                    </div>
+                    <h4 class="font-bold text-lg dark:text-white">${escapeHtml(p.title)}</h4>
+                    <p class="text-purple-500 text-xs font-medium">${p.category.toUpperCase()}</p>
+                    <div class="mt-1">${generateRatingHtml(p.rating, p.reviews)}</div>
+                    <p class="font-extrabold mt-2 text-xl text-green-600 dark:text-cyan-400">${money(p.price)}</p>
+                    <div class="mt-3 flex gap-2">
+                        <button class="openBtn px-3 py-1 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700" data-id="${p.id}">Detail</button>
+                        <button class="addBtn px-3 py-1 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition" data-id="${p.id}" ${isOutOfStock ? 'disabled' : ''}>Tambah</button>
+                        <button class="wishlistBtn px-3 py-1 border border-gray-300 text-sm rounded-lg hover:bg-red-100 text-gray-500 transition dark:border-gray-700 dark:hover:bg-red-900" data-id="${p.id}"><i class="fas fa-heart"></i></button>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+            displayed += chunk.length;
+            
+            if(displayed >= currentProducts.length) {
+                loadMoreBtn.style.display='none';
+                document.getElementById('endMessage').classList.remove('hidden');
+            } else {
+                loadMoreBtn.style.display='inline-block';
+                document.getElementById('endMessage').classList.add('hidden');
+            }
+
+            attachButtons();
+        }
+
+        function attachButtons(){
+            document.querySelectorAll('.openBtn').forEach(b=> b.onclick = ()=> openModal(b.dataset.id));
+            document.querySelectorAll('.addBtn').forEach(b=> b.onclick = ()=> addToCart(b.dataset.id));
+            document.querySelectorAll('.wishlistBtn').forEach(b=> b.onclick = ()=> addToWishlist(b.dataset.id));
+        }
+
+        // --- EVENT HANDLERS ---
+        function openModal(id){
+            const p = products.find(x=>x.id===id);
+            if(!p) return;
+            document.getElementById('modalImg').src = p.img;
+            document.getElementById('modalTitle').textContent = p.title;
+            document.getElementById('modalCategory').textContent = p.category.toUpperCase();
+            document.getElementById('modalPrice').textContent = money(p.price);
+            document.getElementById('modalDesc').textContent = p.desc;
+            document.getElementById('modalRating').innerHTML = generateRatingHtml(p.rating, p.reviews);
+            document.getElementById('addCartBtn').onclick = () => {
+                addToCart(p.id);
+                document.getElementById('closeModal').click(); // Close modal after adding to cart
+            };
+
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Animate modal content
+            setTimeout(()=> document.getElementById('modalContent').classList.add('scale-100'), 10);
+        }
+
+        function closeModalHandler(){
+            const modalContent = document.getElementById('modalContent');
+            modalContent.classList.remove('scale-100');
+            setTimeout(()=>{
+                document.getElementById('modal').classList.add('hidden');
+                document.getElementById('modal').classList.remove('flex');
+                modalContent.classList.add('scale-95'); // Reset scale for next open
+            }, 300);
+        }
+
+        function addToCart(id){
+            const p = products.find(x=>x.id===id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...p, quantity: 1 });
+            }
+            updateCartBadge();
+            // Switched to a more subtle notification
+            console.log('Ditambahkan ke keranjang: ' + p.title + ' (Total: ' + (existing ? existing.quantity : 1) + ')');
+        }
+
+        function addToWishlist(id){
+            const p = products.find(x=>x.id===id);
+            if(!wishlist.find(x=>x.id===id)) {
+                wishlist.push(p);
+                updateWishlistBadge();
+                console.log('Ditambahkan ke wishlist: ' + p.title);
+            } else {
+                wishlist = wishlist.filter(x=>x.id!==id);
+                updateWishlistBadge();
+                console.log('Dihapus dari wishlist: ' + p.title);
+            }
+        }
+
+        function updateCartBadge(){
+            const badge = document.getElementById('cartBadge');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = totalItems;
+            badge.style.display = totalItems > 0 ? 'inline' : 'none';
+        }
+
+        function updateWishlistBadge(){
+            const badge = document.getElementById('wishlistBadge');
+            badge.textContent = wishlist.length;
+            badge.style.display = wishlist.length > 0 ? 'inline' : 'none';
+        }
+
+        document.getElementById('closeModal').onclick = closeModalHandler;
+        document.getElementById('loadMore').onclick = renderChunk;
+        
+        // Dark Mode Toggle Logic
+        document.getElementById('darkToggle').onclick = () => {
+            document.getElementById('body').classList.toggle('dark-mode');
+            const isDark = document.getElementById('body').classList.contains('dark-mode');
+            document.getElementById('darkToggle').innerHTML = isDark ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
+        };
+
+        // Search Input Logic
+        document.getElementById('searchInput').addEventListener('input', (e)=>{
+            const q = e.target.value.toLowerCase();
+            const selectedCat = document.querySelector('.cat-item.font-bold')?.dataset.cat || 'all';
+            
+            grid.innerHTML = '';
+            displayed = 0;
+            currentProducts = products.filter(p=> 
+                (p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)) && 
+                (selectedCat === 'all' || p.category === selectedCat)
+            );
+            document.getElementById('mainTitle').textContent = `Hasil Pencarian untuk: "${e.target.value}"`;
+            renderChunk();
+        });
+
+        // Sort Select Logic
+        document.getElementById('sortSelect').addEventListener('change', (e)=>{
+            const sort = e.target.value;
+            let currentFiltered = currentProducts; // Sorts the currently filtered list
+            
+            if(sort === 'low-high') currentFiltered.sort((a,b)=>a.price-b.price);
+            else if(sort === 'high-low') currentFiltered.sort((a,b)=>b.price-a.price);
+            else currentFiltered = [...products].filter(p=> currentProducts.some(cp => cp.id === p.id)); // Revert to original order of currently filtered items
+
+            grid.innerHTML = '';
+            displayed = 0;
+            renderChunk();
+        });
+        
+        // Category Filter Logic
+        document.querySelectorAll('.cat-item').forEach(li=> li.onclick = (e)=>{
+            // Remove bold from all, add to clicked one
+            document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('font-bold', 'text-purple-600', 'dark:text-white'));
+            e.target.classList.add('font-bold', 'text-purple-600', 'dark:text-white');
+
+            const cat = e.target.dataset.cat;
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            
+            grid.innerHTML = '';
+            displayed = 0;
+            currentProducts = products.filter(p=> {
+                const categoryMatch = cat === 'all' || p.category === cat;
+                const searchMatch = p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+                return categoryMatch && searchMatch;
+            });
+            document.getElementById('mainTitle').textContent = cat === 'all' ? 'Semua Produk Terbaru' : `Kategori: ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+            renderChunk();
+        });
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set 'Semua Produk' as active initially
+            document.querySelector('[data-cat="all"]').classList.add('font-bold', 'text-purple-600', 'dark:text-white');
+            
+            // Re-render chunk (using a timeout to ensure it runs after all data initialization)
+            setTimeout(renderChunk, 0); 
+        });
+
+        // COD and Home Button placeholder actions
+        document.getElementById('codBtn').onclick = () => alert('Fungsi COD (Cash On Delivery) dipilih.');
+        document.getElementById('homeBtn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'}); // Scroll to top
+        document.getElementById('cartBtn').onclick = () => alert('Membuka halaman Keranjang (' + cart.length + ' item)...');
+        document.getElementById('wishlistBtn').onclick = () => alert('Membuka halaman Wishlist (' + wishlist.length + ' item)...');
+        document.getElementById('accountBtn').onclick = () => alert('Membuka halaman Akun Pengguna...');
+        document.getElementById('sortBtn').onclick = () => document.getElementById('sortSelect').focus();
+    </script>
+</body>
+</html>
